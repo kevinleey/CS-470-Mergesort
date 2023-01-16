@@ -3,10 +3,10 @@ const top_margin = 20;
 const left_margin = 20;
 const size_elements = 30;
 const space_elements = 8;
-const max_value = 200;
-const min_vlaue = -200;
+const max_value = 999;
+const min_vlaue = -999;
 const speed = 400;
-const num_elements = 20; //n
+const num_elements = 40; //n
 const num_elements_returned = 7; //k
 
 // MARK: Defining Classes
@@ -131,7 +131,7 @@ async function mergeSort(min, max, depth) {
         await mergeSort(mid + 1, max, depth + 1);
 
         await sleep(speed);
-        merge(min, mid, max, depth);
+        await merge(min, mid, max, depth);
     }
 }
 
@@ -150,7 +150,7 @@ function copy(min, max, depth, left) {
     }
 }
 
-function merge(min, mid, max) {
+async function merge(min, mid, max) {
     let tempArr = [];
     for (let i = min; i <= max; ++i) {
         tempArr[i] = new Value(values[i].value, values[i].index);
@@ -158,6 +158,7 @@ function merge(min, mid, max) {
     let left = min;
     let right = mid + 1;
     for (let i = min; i <= max; ++i) {
+        await sleep(200);
         if (left > mid) {
             values[i] = tempArr[right];
             elementData[tempArr[right].index].updateCurElementPos(elementData[i].getxpos(), elementData[i].getypos());
