@@ -8,6 +8,11 @@
     text-align: center;
 }
 
+#numElReturned {
+    font-size: 20px;
+    text-align: center;
+}
+
 #array {
     display: flex;
     justify-content: center;
