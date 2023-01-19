@@ -2,7 +2,7 @@
 ### Project 1 
 Given n unsorted integers, we want the top k integers. No other information is given other than 0 < k < n.
 
-We will be comparing merge sort and quickselect to see which algorithm would be better to solve this interview questions.
+We will be comparing merge sort and quickselect to see which algorithm would be better to solve this interview question.
 
 ### Merge Sort Algorithm
 The merge sort algorithm is a divide and conquer sorting algorithm. It divides an array into smaller arrays and sorts them.  Then, it merges the subarrays together to create one sorted array.  
