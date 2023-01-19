@@ -27,3 +27,7 @@ Use the quickselect.html to see the animated code we created to represent the qu
 ### Comparison
 
 Based on the problem given, quickselect is a better algorithm to use compared to mergesort. 
+
+### Group Members
+Rachel Qualls, Kevin Lee, Sami Kellogg, Jade Cartolano
+
