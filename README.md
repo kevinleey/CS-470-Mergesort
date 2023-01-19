@@ -15,6 +15,8 @@ Use the mergesort.html to see the animated code we created to represent the merg
 
 
 ### Quickselect Algorithm 
+Quickselect was adapted from the quicksort algorithm that choses a pivot point and then moves all integers greater than the pivot to the left and all numbers less than the pivot to the right. Typically, this is done until the array of integers is sorted, however we adapted Quickselect to stop once the pivot number has the amount of numbers, we are looking for to the left of it. This allows for the top k elements to be returned in an unordered fashion but in a smaller time complexity than typically Quicksort and mergesort. The time complexity is O(n).
+
 The quickselect algorithm uses the partition step of quick sort. 
 
 The time complexity for quickselect is O(n).
