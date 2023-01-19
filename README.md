@@ -15,6 +15,12 @@ Use the mergesort.html to see the animated code we created to represent the merg
 
 
 ### Quickselect Algorithm 
+The quickselect algorithm uses the partition step of quick sort. 
+
+The time complexity for quickselect is O(n).
+
+Use the quickselect.html to see the animated code we created to represent the quickselect algorithm.
+
 
 ### Comparison
 
