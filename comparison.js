@@ -1,17 +1,24 @@
 // MARK: Setting Constants
+
+// Visual constants
 const top_margin_quick = 50;
 const left_margin = 20;
 const size_elements = 30;
 const top_margin_merge = top_margin_quick * 4 + size_elements * 2;
 const space_elements = 8;
+const speed = 200;
+
+// Range
 const max_value = 999;
 const min_vlaue = -999;
-const speed = 200;
+
+// N K constraints
 const num_elements = 25; //n
 const num_elements_returned = 10; //k
 
 // MARK: Defining Classes
 
+// Links value to its element data
 class Value {
     value;
     index;
@@ -21,6 +28,7 @@ class Value {
     }
 }
 
+// Element data for Mergesort elements
 class MergeElementData {
     value;
     curElement;
@@ -38,6 +46,7 @@ class MergeElementData {
         this.curPos = -1;
     }
 
+    // Add sort of a child or duplicate element to the screen (show splitting array)
     async addElement(xpos, ypos) {
         let element = document.createElement("div");
 
@@ -46,6 +55,7 @@ class MergeElementData {
 
         element.textContent = this.value;
 
+        // Color element based on value
         let color_percent = Math.floor((this.value - min_vlaue) / (max_value - min_vlaue) * 255);
         let r_value = 50 + .8 * color_percent;
         let g_value = 250 - .9 * color_percent;
@@ -58,7 +68,7 @@ class MergeElementData {
         if (this.elements.length == 0) {
             element.style.left = xpos + "px";
             element.style.top = ypos + "px";
-        } else {
+        } else { // elements after first are initialized to parent's x and y coord to show animaiton
             element.style.left = this.curElement.xpos + "px";
             element.style.top = this.curElement.ypos + "px";
             ++this.curPos;
@@ -71,11 +81,12 @@ class MergeElementData {
 
         document.body.appendChild(newElement.element);
 
+        // show animation
         await sleep(1);
-
         newElement.animate();
     }
 
+    // animate curent (lowest) element to new position
     updateCurElementPos(xpos, ypos) {
         this.curElement.xpos = xpos;
         this.curElement.ypos = ypos;
@@ -90,12 +101,14 @@ class MergeElementData {
         return this.elements[this.curPos].ypos;
     }
 
+    // Delete 2nd lowest element
     deleteNextElement() {
         this.elements[this.curPos].element.remove();
         --this.curPos;
     }
 }
 
+// Element data for Quickselect elements
 class QuickElementData {
     value;
     element;
@@ -117,6 +130,7 @@ class QuickElementData {
 
         element.textContent = this.value;
 
+        // Color element based on value
         let color_percent = Math.floor((this.value - min_vlaue) / (max_value - min_vlaue) * 255);
         let r_value = 50 + .8 * color_percent;
         let g_value = 250 - .9 * color_percent;
@@ -136,11 +150,13 @@ class QuickElementData {
         return newElement;
     }
 
+    // Move elements down to show what part of the array we are partitioning
     moveDown() {
         this.element.ypos = top_margin_quick * 2 + size_elements;
         this.element.animate();
     }
 
+    // Move from a lower position to a new (more sorted) position
     moveBack(xpos) {
         this.xpos = xpos;
         this.element.xpos = xpos;
@@ -148,25 +164,30 @@ class QuickElementData {
         this.element.animate();
     }
 
+    // Move back to original location
     moveBackOgr() {
         this.element.ypos = this.ypos;
         this.element.animate();
     }
 
+    // Make outline of element clear
     clearOutline() {
         this.element.element.style.borderStyle = "none";
     }
 
+    // Make outline of element red
     outlineRed() {
         this.element.element.style.borderStyle = "solid";
         this.element.element.style.borderColor = "red";
     }
 
+    // Make outline of element yellow
     outlineYellow() {
         this.element.element.style.borderStyle = "solid";
         this.element.element.style.borderColor = "orange";
     }
 
+    // Make outline of element green
     outlineGreen() {
         this.element.element.style.borderStyle = "solid";
         this.element.element.style.borderColor = "green";
@@ -177,6 +198,7 @@ class QuickElementData {
     }
 }
 
+// Element data for each DIV
 class Element {
     element;
     xpos;
@@ -188,6 +210,7 @@ class Element {
         this.ypos = ypos;
     }
 
+    // animate to new position
     animate() {
         this.element.style.left = this.xpos;
         this.element.style.top = this.ypos;
@@ -196,35 +219,41 @@ class Element {
 
 // MARK: Helper Functions
 
+// Simple sleep function for given ms
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Mergesort
 async function mergeSort(min, max, depth) {
     if (min < max) {
         let mid = Math.floor((min + max) / 2);
 
+        // Split left
         await sleep(speed);
         copy(min, mid, depth + 1, true);
         await mergeSort(min, mid, depth + 1);
 
+        // Split right
         await sleep(speed);
         copy(mid + 1, max, depth + 1, false);
         await mergeSort(mid + 1, max, depth + 1);
 
+        // Merge left and right
         await sleep(speed);
         await merge(min, mid, max, depth);
     }
 }
 
+// Used to visually split array (shows the array being split at a lower level)
 function copy(min, max, depth, left) {
     let count = 0;
-    if (left) {
+    if (left) { // if we are splitting left array
         for (let i = min; i <= max; ++i) {
             mergeElementData[i].addElement(mergeElementData[min].initialxpos + size_elements * count, top_margin_merge + (size_elements + space_elements) * (depth));
             ++count;
         }
-    } else {
+    } else { // splitting right array
         for (let i = max; i >= min; --i) {
             mergeElementData[i].addElement(mergeElementData[max].initialxpos - size_elements * count, top_margin_merge + (size_elements + space_elements) * (depth));
             ++count;
@@ -232,7 +261,9 @@ function copy(min, max, depth, left) {
     }
 }
 
+// Merge step of mergesort (merge arrays together)
 async function merge(min, mid, max) {
+    // copy data to temp array
     let tempArr = [];
     for (let i = min; i <= max; ++i) {
         tempArr[i] = new Value(mergeValues[i].value, mergeValues[i].index);
@@ -241,22 +272,22 @@ async function merge(min, mid, max) {
     let right = mid + 1;
     for (let i = min; i <= max; ++i) {
         await sleep(speed/2);
-        if (left > mid) {
+        if (left > mid) { // no more values in left array
             mergeValues[i] = tempArr[right];
             mergeElementData[tempArr[right].index].updateCurElementPos(mergeElementData[i].getxpos(), mergeElementData[i].getypos());
             mergeElementData[i].deleteNextElement();
             ++right;
-        } else if (right > max) {
+        } else if (right > max) { // no more values in right array
             mergeValues[i] = tempArr[left];
             mergeElementData[tempArr[left].index].updateCurElementPos(mergeElementData[i].getxpos(), mergeElementData[i].getypos());
             mergeElementData[i].deleteNextElement();
             ++left;
-        } else if (tempArr[left].value < tempArr[right].value) {
+        } else if (tempArr[left].value < tempArr[right].value) { // value in right array greater
             mergeValues[i] = tempArr[right];
             mergeElementData[tempArr[right].index].updateCurElementPos(mergeElementData[i].getxpos(), mergeElementData[i].getypos());
             mergeElementData[i].deleteNextElement();
             ++right;
-        } else {
+        } else { // value in left array equal or greater
             mergeValues[i] = tempArr[left];
             mergeElementData[tempArr[left].index].updateCurElementPos(mergeElementData[i].getxpos(), mergeElementData[i].getypos());
             mergeElementData[i].deleteNextElement();
@@ -265,17 +296,21 @@ async function merge(min, mid, max) {
     }
 }
 
+// Partition step of Quickselect
 async function partitionEl(p, r) {
     left = p + 1;
     right = r;
     await sleep(speed / 2);
+    // Move section down
     for (let i = p; i <= r; ++i) {
         quickElementData[quickValues[i].index].moveDown();
     }
+    // set first element as pivot (outline red)
     let pivot = p;
     quickElementData[quickValues[pivot].index].outlineRed();
 
     while (left <= right) {
+        // if left value is greater, just copy back
         while (quickValues[left].value > quickValues[pivot].value) {
             await sleep(speed);
             quickElementData[quickValues[left].index].outlineYellow();
@@ -285,15 +320,18 @@ async function partitionEl(p, r) {
                 break;
             }
         }
+        // if right value is greater, just copy back
         while (quickValues[right].value < quickValues[pivot].value) {
             await sleep(speed);
             quickElementData[quickValues[right].index].outlineGreen();
             quickElementData[quickValues[right].index].moveBackOgr();
             --right;
         }
+        // swap elements (left and right)
         if (left <= right) {
             console.log("swap " + quickValues[left].value + " at pos " + quickElementData[quickValues[left].index].getxpos() +  " and " + quickValues[right].value + " at pos " + quickElementData[quickValues[right].index].getxpos());
             await sleep(speed);
+            // use temp to not loose values when swapping
             let tmp = quickValues[left];
             let xtmp = quickElementData[quickValues[right].index].getxpos();
             quickElementData[quickValues[right].index].outlineYellow();
@@ -307,6 +345,7 @@ async function partitionEl(p, r) {
         }
     }
 
+    // Swap pivot and last right element
     await sleep(speed);
     let tmp = quickValues[pivot];
     let xtmp = quickElementData[quickValues[right].index].getxpos();
@@ -317,6 +356,7 @@ async function partitionEl(p, r) {
     quickValues[pivot] = quickValues[right];
     quickValues[right] = tmp;
 
+    // clear outline for all elements
     for (let i = p; i <= r; ++i) {
         quickElementData[quickValues[i].index].clearOutline();
         console.log(quickValues[i].value);
@@ -325,21 +365,25 @@ async function partitionEl(p, r) {
     return right;
 }
 
+// Quickselect
 async function quicksortEl(p, r) {
     if (p < r) {
         var q = await partitionEl(p, r);
 
         await sleep(speed);
 
+        // if the partition is greater than the num of elements we want, quickselect left side
         if (q > num_elements_returned - 1) {
             await quicksortEl(p, q-1);
         }
+        // if the partition is less than the num of elements we want, quickselect right side
         if (q < num_elements_returned - 1) {
             await quicksortEl(q+1, r);
         }
     }
 }
 
+// Display box of the numbers we want returned (k)
 function displayBox(top_margin) {
     let box = document.createElement("div");
     box.style.width = (size_elements + space_elements ) * num_elements_returned + "px";
@@ -352,6 +396,7 @@ function displayBox(top_margin) {
     document.body.appendChild(box);
 }
 
+// Display names of algorithms
 function displayNames(name, top_margin) {
     let box = document.createElement("div");
     box.textContent = name;
@@ -364,6 +409,7 @@ function displayNames(name, top_margin) {
 
 }
 
+// Run algorithms at the same time
 async function runSorts() {
     displayNames("Merge Sort", top_margin_merge);
     displayNames("Quick Select", top_margin_quick);
@@ -389,4 +435,5 @@ for (let i = 0; i < num_elements; ++i) {
     quickElementData.push(new QuickElementData(value, i, top_margin_quick));
 }
 
+// run program
 runSorts();
