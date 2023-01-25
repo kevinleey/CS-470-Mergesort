@@ -2,6 +2,7 @@
 
 // Visual constants
 const top_margin_quick = 50;
+const top_margin_desc = 200;
 const left_margin = 20;
 const size_elements = 30;
 const top_margin_merge = top_margin_quick * 4 + size_elements * 2;
@@ -309,6 +310,12 @@ async function partitionEl(p, r) {
     let pivot = p;
     quickElementData[quickValues[pivot].index].outlineRed();
 
+    let pivotXPos = quickElementData[quickValues[pivot].index].xpos;
+
+    changeDesc(`New Pivot: ${quickValues[pivot].value}`, pivotXPos);
+    await sleep(3000);
+    changeDesc(`New Pivot: ${quickValues[pivot].value}       SORTING...`, pivotXPos);
+
     while (left <= right) {
         // if left value is greater, just copy back
         while (quickValues[left].value > quickValues[pivot].value) {
@@ -345,6 +352,10 @@ async function partitionEl(p, r) {
         }
     }
 
+    await sleep(1000);
+    changeDesc('SORTED! Putting pivot in its right position.', pivotXPos);
+    await sleep(3000);
+
     // Swap pivot and last right element
     await sleep(speed);
     let tmp = quickValues[pivot];
@@ -374,13 +385,20 @@ async function quicksortEl(p, r) {
 
         // if the partition is greater than the num of elements we want, quickselect left side
         if (q > num_elements_returned - 1) {
+            changeDesc(text = 'Pivot index > 9! Quick select on left side.');
+            await sleep(3000);
+            changeBndry('right', quickElementData[quickValues[q].index].xpos);
             await quicksortEl(p, q-1);
         }
         // if the partition is less than the num of elements we want, quickselect right side
         if (q < num_elements_returned - 1) {
+            changeDesc(text = 'Pivot index < 9! Quick select on right side.');
+            await sleep(3000);
+            changeBndry('left', quickElementData[quickValues[q+1].index].xpos);
             await quicksortEl(q+1, r);
         }
     }
+    changeDesc(text = 'Top 10 elements found!');
 }
 
 // Display box of the numbers we want returned (k)
@@ -406,17 +424,71 @@ function displayNames(name, top_margin) {
     box.style.left = left_margin - (space_elements / 2) + "px";
     box.style.position = "absolute";
     document.body.appendChild(box);
+}
 
+// Initialize description box
+async function setDesc(top_margin_desc) {
+    let box = document.createElement("div");
+    box.setAttribute('id', 'desc');
+    box.style.height = size_elements + "px";
+    box.style.top = top_margin_desc + "px";
+    box.style.left = left_margin - (space_elements / 2) + "px";
+    box.style.position = "absolute";
+    document.body.appendChild(box);
+}
+
+// Initialize boundary lines
+async function setBoundaries() {
+    let left = document.createElement("div");
+    left.setAttribute('id', 'leftBndry');
+    left.style.height = (size_elements * 4) + "px";
+    left.style.width = 2 + "px";
+    left.style.backgroundColor = "grey";
+    left.style.top = top_margin_quick + "px";
+    left.style.left = quickElementData[quickValues[0].index].xpos - 4 + "px";
+    left.style.position = "absolute";
+    left.style.transition = 0.5 + "s";
+    document.body.appendChild(left);
+
+    let right = document.createElement("div");
+    right.setAttribute('id', 'rightBndry');
+    right.style.height = (size_elements * 4) + "px";
+    right.style.width = 2 + "px";
+    right.style.backgroundColor = "grey";
+    right.style.top = top_margin_quick + "px";
+    right.style.left = quickElementData[quickValues[quickElementData.length-1].index].xpos + size_elements + 4 + "px";
+    right.style.position = "absolute";
+    right.style.transition = 0.5 + "s";
+    document.body.appendChild(right);
+}
+
+async function changeBndry(side, newXPos) {
+    let bndry;
+    if (side == 'left') {
+        bndry = document.getElementById('leftBndry');
+    } else if (side == 'right') {
+        bndry = document.getElementById('rightBndry');
+    }
+    bndry.style.left = newXPos;
+}
+
+// Change description box text and location
+async function changeDesc(text, left_margin) {
+    let box = document.getElementById('desc');
+    box.textContent = text;
+    box.style.left = left_margin + "px";
 }
 
 // Run algorithms at the same time
 async function runSorts() {
     displayNames("Merge Sort", top_margin_merge);
     displayNames("Quick Select", top_margin_quick);
+    setDesc(top_margin_desc);
     mergeSort(0, num_elements - 1, 0);
     quicksortEl(0, num_elements - 1);
     displayBox(top_margin_merge);
     displayBox(top_margin_quick);
+    setBoundaries();
 }
 
 // MARK: Main Program 
